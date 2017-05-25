@@ -1,0 +1,325 @@
+<head>
+<title>AMPL Wizard</title>
+<!-- Tips from http://www.microsoft.com/technet/scriptcenter/topics/htas/tutorial1.mspx,
+	and http://www.microsoft.com/technet/scriptcenter/topics/htas/tutorial2.mspx.
+	See also http://www.microsoft.com/technet/scriptcenter/hubs/htas.mspx.
+
+ApplicationName: Sets the name of the HTA. This name is used to enforce the SingleInstance property, and is also the name that appears in Windows Task Manager.
+Border: Sets the type of border used for the HTA window. Values include thick (for a resizable window) and thin (for a non-resizable window).
+Caption: Yes/No value specifying whether the HTA displays a caption in the title bar. The default value is Yes.
+
+MaximizeButton: Yes/No value specifying whether the HTA displays a Maximize button in the title bar. The default value is Yes.
+MinimizeButton: Yes/No value specifying whether the HTA displays a Minimize button in the title bar. The default value is Yes.
+Scroll: Yes/No value specifying whether the HTA will scroll if returned data is larger than the window size. The default value is Yes.
+
+ShowInTaskbar: Yes/No value specifying whether the HTA is shown in the Windows taskbar. The default value is Yes.
+SingleInstance: Yes/No value specifying whether more than one instance of this HTA can be active at a time. For this property to take effect, you must also specify an ApplicationName. The default value is Yes.
+SysMenu: Yes/No value specifying whether the HTA displays the System menu in the title bar. The default value is Yes.
+WindowState: Sets the initial size of the HTA window. Values are Normal, Minimize, and Maximize. By default the WindowState is set to Normal.
+
+For a File Open dialog, see http://www.microsoft.com/technet/scriptcenter/topics/htas/fileopen.mspx. 
+	 For databases, see http://www.codeproject.com/html/DBTool.asp.
+	 
+<Size is number of rows. 1 is a dropdown. 2+ is a scrollable box.>
+<select size="1" name="OptionChooser" onChange="Process_buttons">
+    <option value="1">Option 1</option>
+    <option value="2">Option 2</option>
+    <option value="3">Option 3</option>
+</select>
+
+-->
+<HTA:APPLICATION APPLICATIONNAME="Wizard for AMPL and GLPK"
+	Border="thick" Caption="Yes" MaximizeButton="Yes" MinimizeButton="Yes"
+    SCROLL="no" SINGLEINSTANCE="yes" WINDOWSTATE="normal">
+</head>
+
+<script language="VBScript">
+' dim currentselection
+
+Sub Begin ' Sets the first one checked.
+	RadioOption(0).Checked = true
+	Paramintegrality(0).Checked = true
+	Script(0).Checked = true
+	Paramsdefault.value = "0"
+	VarLowerbound.value = "0"
+	currentselection = "set1"
+	Process_buttons
+end sub
+
+Sub Process_buttons
+	if RadioOption(0).Checked then ' set ----------------------------------
+		set1.style.display = "inline"
+		param.style.display = "none"
+		var.style.display = "none"
+		constraint.style.display = "none"
+		data.style.display = "none"
+		objective.style.display = "none"
+		script1.style.display = "none"
+
+		outputtext.innerHTML = "set " + SetName.value
+	elseif RadioOption(1).Checked then ' param ----------------------------------
+		set1.style.display = "none"
+		param.style.display = "inline"
+		var.style.display = "none"
+		constraint.style.display = "none"
+		data.style.display = "none"
+		objective.style.display = "none"
+		script1.style.display = "none"
+
+		if len(Paramsdefault.value) >= 1 then
+			outputtext.innerHTML = "param " + ParamName.value + " default " + paramsdefault.value
+		else
+			outputtext.innerHTML = "param " + ParamName.value
+		end if
+		
+		if Paramintegrality(1).Checked then
+			outputtext.innerHTML = outputtext.innerHTML + " integer"
+		elseif Paramintegrality(2).Checked then
+			outputtext.innerHTML = outputtext.innerHTML + " binary"
+		end if
+		
+		if len(ParamLowerbound.value) >= 1 then
+			outputtext.innerHTML = outputtext.innerHTML + " >= " + ParamLowerbound.value
+		end if
+		
+		if len(ParamUpperbound.value) >= 1 then
+			outputtext.innerHTML = outputtext.innerHTML + " <= " + ParamUpperbound.value
+		end if
+			
+	elseif RadioOption(2).Checked then ' var ----------------------------------
+		set1.style.display = "none"
+		param.style.display = "none"
+		var.style.display = "inline"
+		constraint.style.display = "none"
+		data.style.display = "none"
+		objective.style.display = "none"
+		script1.style.display = "none"
+		
+		if len(vardefault.value) >= 1 then
+			outputtext.innerHTML = "param " + VarName.value + " default " + Vardefault.value
+		else
+			outputtext.innerHTML = "param " + VarName.value
+		end if
+		
+		if Varintegrality(1).Checked then
+			outputtext.innerHTML = outputtext.innerHTML + " integer"
+		elseif Varintegrality(2).Checked then
+			outputtext.innerHTML = outputtext.innerHTML + " binary"
+		end if
+		
+		if len(VarLowerbound.value) >= 1 then
+			outputtext.innerHTML = outputtext.innerHTML + " >= " + VarLowerbound.value
+		end if
+		
+		if len(VarUpperbound.value) >= 1 then
+			outputtext.innerHTML = outputtext.innerHTML + " <= " + VarUpperbound.value
+		end if
+		
+		' outputtext.innerHTML = "var " + Inputname.value
+	elseif RadioOption(3).Checked then ' constraint ----------------------------------
+		set1.style.display = "none"
+		param.style.display = "none"
+		var.style.display = "none"
+		constraint.style.display = "inline"
+		data.style.display = "none"
+		objective.style.display = "none"
+		script1.style.display = "none"
+		
+		'outputtext.innerHTML = "subject to " + Inputname.value + ";"
+	elseif RadioOption(4).Checked then ' data ----------------------------------
+		set1.style.display = "none"
+		param.style.display = "none"
+		var.style.display = "none"
+		constraint.style.display = "none"
+		data.style.display = "inline"
+		objective.style.display = "none"
+		script1.style.display = "none"
+		
+		outputtext.innerHTML = "zzzz " ' Need to choose which parameter.
+	elseif RadioOption(5).Checked then ' objective ----------------------------------
+		set1.style.display = "none"
+		param.style.display = "none"
+		var.style.display = "none"
+		constraint.style.display = "none"
+		data.style.display = "none"
+		objective.style.display = "inline"
+		script1.style.display = "none"
+		
+		outputtext.innerHTML = "zzzz " ' Need to choose maximize or minimize.
+	elseif RadioOption(6).Checked then ' script ----------------------------------
+		set1.style.display = "none"
+		param.style.display = "none"
+		var.style.display = "none"
+		constraint.style.display = "none"
+		data.style.display = "none"
+		objective.style.display = "none"
+		script1.style.display = "inline"
+		
+		if Script(0).Checked then
+			outputtext.innerHTML = "solve"
+		elseif Script(1).Checked then
+			outputtext.innerHTML = "display"
+		elseif Script(2).Checked then
+			outputtext.innerHTML = "expand"
+		end if
+	end if
+	
+	outputtext.innerHTML = outputtext.innerHTML + ";"
+End Sub
+
+'--------------------------------------------
+sub submit ' This passes text to Scite.
+	text = outputtext.innertext
+	
+	Dim WSHShell
+	set WshShell = CreateObject("WScript.Shell")
+	
+	' Check all running processes with Windows Management Instrumentation. 
+	dim sc1_handle, found_it
+	found_it = false
+	
+	' Pass the text to Sci.exe.
+	For Each Process In GetObject("winmgmts:").InstancesOf("Win32_process") 
+		if "Sc1.exe" = Process.Name then
+			sc1_handle = Process.Handle
+			found_it = true
+			exit for
+		end if
+	Next 
+	
+	if found_it then
+		WshShell.AppActivate sc1_handle
+		WshShell.SendKeys text
+	else
+		msgbox "Could not pass text to Scite."
+	end if
+
+	' Now bring back the macro window.
+	if false = (WshShell.AppActivate ("AMPL Wizard")) then
+		msgbox "Could not bring back AMPL Wizard."
+	end if
+end sub
+' -----------------------------
+</script>
+
+<body onload="Begin">
+<p>This wizard is for AMPL or GNU LP Kit, for use with Scite. It helps you set up sets, parameters, variables, 
+objective functions, constraints, data, and scripts.
+When you click the Insert button, this wizard will insert the text into Scite <b>at the current cursor position</b>.
+<i>Experimental.</i></p>
+
+<p>Which statement do you want to insert?</p>
+<p><input type="radio" name="RadioOption" value="set1" onClick="Process_buttons" ID="Radio1">set
+<input type="radio" name="RadioOption" value="param" onClick="Process_buttons" ID="Radio1">parameter (data)
+<input type="radio" name="RadioOption" value="var" onClick="Process_buttons" ID="Radio2">decision variable 
+<input type="radio" name="RadioOption" value="constraint" onClick="Process_buttons" ID="Radio3">constraint
+<input type="radio" name="RadioOption" value="data" onClick="Process_buttons" ID="Radio4">data
+<input type="radio" name="RadioOption" value="objective" onClick="Process_buttons" ID="Radio5">objective
+<input type="radio" name="RadioOption" value="script" onClick="Process_buttons" ID="Radio6">script command
+</p>
+
+<span id="Helptext"></span>
+
+<!-- set ---------------------------------->
+<span id="set1"><p>The <b>set</b> key word</a> is used to tell AMPL that you have a bunch of related objects, such as cities, nodes, arcs, etc.
+	You use sets most often in a model file. Once you have defined a set, you can use it for the subscripts on parameters and variables.</p>
+
+<p><b>Step 1. Name the set.</b> <input type="text" name="SetName" size="10" maxLength="20" onkeyup="Process_buttons" ID="Text1">
+	Consider putting parameter names in Title case, with letters from the middle of the alphabet.</p>
+	
+<p><b>Step 2 - optional. Give it some default members. [Inactive] </b>
+	<input type="text" name="SetDefault" size="10" maxLength="20" onkeyup="Process_buttons" ID="Text1"></p>
+
+<b>Step 3. Insert the set into Scite, at the cursor.&nbsp;</b></span>
+
+<!-- param ---------------------------------->
+<span id="param">
+<p>The param key word</a> is used to define a parameter that is used for data or a counter.
+	It is not a decision variable, and will not be calculated by the solver (e.g. CPlex or MINOS).
+	Rather, a parameter is data that you give the model.</p>
+	
+	<p><b>Step 1. Give it a name.</b> <input type="text" name="ParamName" size="10" maxLength="20" onkeyup="Process_buttons" ID="Text1">
+	Consider putting the parameter name in UPPER case, with letters from the beginning of the alphabet,
+	with 2 or more characters. AMPL is case sensitive. Don't put spaces in the name.</p>
+	
+	<p><b>Step 2 - optional. Give it a default value.</b> <input type="text" name="Paramsdefault" size="10" maxLength="20" onkeyup="Process_buttons">
+	You can give the parameter a starting default value (such as 0), in case it is not specified anywhere else.
+	If you do not use the &#8220;default&#8221; key word, you should assign it a value somewhere
+	(e.g. in a data or run file). Otherwise AMPL may complain that Y has not been assigned a value.</p>
+
+	<p><b>Step 3 - optional. Give it a range.</b> Lower bound <input type="text" name="ParamLowerbound" size="10" maxLength="20" onkeyup="Process_buttons">
+	Upper bound <input type="text" name="ParamUpperbound" size="10" maxLength="20" onkeyup="Process_buttons">
+	You can use define a valid range for the parameter, to make sure that your data is reasonable.
+	If your script or data assigns it a data that violates this, AMPL will let you know.</p>
+	
+	<p><b>Step 4 - optional. Give it integrality.</b> <input type="radio" name="Paramintegrality" value="continuous" onClick="Process_buttons" ID="Radiocontinuous">Continuous
+	<input type="radio" name="Paramintegrality" value="integer" onClick="Process_buttons" ID="Radiointeger">Integer
+	<input type="radio" name="Paramintegrality" value="binary" onClick="Process_buttons" ID="Radiobinary">Binary
+	You can specify that the parameter is continuous, integer or binary, so AMPL can warn you if the parameter is fractional.
+	This is NOT the same as requiring a decision variable to be integer, as you tell AMPL the value for a parameter,
+	while AMPL tells you the value of a variable.</p>
+
+	<p>Remember, AMPL treats a parameter as data. You need to specify the value of the parameter somehow, 
+	either with a default value, in a data section, or with the "let" statement.</p>
+	
+	<b>Step 5. Insert the param into Scite, at the cursor.&nbsp;</b> </span>
+
+<!-- var ---------------------------------->
+<span id="var">The <b>var</b> key word</a> is used to define a variable that will be calculated by the solver (e.g. CPlex or MINOS).
+A variable is not data that you give the model. Rather, it is represents a decision or value that you want to know,
+and you are expecting AMPL to tell you when it has finished solving.</p>
+
+<p><b>Step 1. Give it a name.</b> <input type="text" name="VarName" size="10" maxLength="20" onkeyup="Process_buttons" ID="Text1">
+	Consider putting the variable name in lower case, with letters from the end of the alphabet,
+	with 2 or more characters. AMPL is case sensitive. Don't put spaces in the name.</p>
+	
+	<p><b>Step 2 - optional. Give it a default value.</b> <input type="text" name="Vardefault" size="10" maxLength="20" onkeyup="Process_buttons">
+	You can give the variable a starting default value (such as 0), which the solver may try to use to solve faster.</p>
+
+	<p><b>Step 3 - optional. Give it a bounds.</b> Lower bound <input type="text" name="VarLowerbound" size="10" maxLength="20" onkeyup="Process_buttons">
+	Upper bound <input type="text" name="VarUpperbound" size="10" maxLength="20" onkeyup="Process_buttons">
+	The solver will ensure that the solution value of the variable is within these bounds.
+	Typically, variables have 0 as a lower bound.</p>
+	
+	<p><b>Step 4 - optional. Give it integrality.</b> <input type="radio" name="Varintegrality" value="continuous" onClick="Process_buttons" ID="Radiocontinuous">Continuous
+	<input type="radio" name="Varintegrality" value="integer" onClick="Process_buttons" ID="Radiointeger">Integer
+	<input type="radio" name="Varintegrality" value="binary" onClick="Process_buttons" ID="Radiobinary">Binary
+	You can specify that the variable is continuous, integer or binary.
+	Be aware that models with integer variables can take longer to solve than models with only continuous variables.</p>
+
+	<p>Remember, AMPL (with its solver such as CPlex) decides the value of a decision variable.
+	You would not usually specify the final value of a decision variable.</p>
+	
+	<b>Step 5. Insert the var into Scite, at the cursor.&nbsp;</b></span>
+
+<!-- constraint ---------------------------------->
+<span id="constraint">Tip: consider using TitleCase for a constraint.
+	<br>Set name, case sensitive, no spaces: </span>
+
+<!-- data ---------------------------------->
+<span id="data">Now let's input some data, to specify the values for your parameters.
+	<br>Parameter name that you want to add data for: 
+	<br>Is this 1-dimensional or 2-dimensional?</b></span>
+
+<!-- objective ---------------------------------->
+<span id="objective">Tip: consider using TitleCase for an objective function.
+	<br>Minimize or maximize? </span>
+
+<!-- script ---------------------------------->
+<span id="script1"><b>Step 1. Select a command to insert.</b>
+	<br><input type="radio" name="Script" value="Solve" onClick="Process_buttons" ID="solve">Solve - solve the model.
+	<br><input type="radio" name="Script" value="Display" onClick="Process_buttons" ID="display">Display - show the values of variables or parameters.
+	<br><input type="radio" name="Script" value="Expand" onClick="Process_buttons" ID="expand">Expand - list an objective or constraint in long form (similar to Lindo). [Add piping.]
+	<p><b>Step 2. Insert the command into Scite, at the cursor.</b> Best into a run file! &nbsp;
+	</span>
+
+<!-- "Insert" Button, which forces passing the constructed text to Scite, and output text. -->
+<input type="button" value="Insert" name="Insert" onClick="Submit" ID="Button1">&nbsp;&nbsp;
+
+<!-- Output text, which appears after the button, to show what will be passed to Scite. -->
+<span id="Outputtext"></span>
+
+
+</body>
+
+
